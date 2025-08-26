@@ -5,7 +5,8 @@ namespace App\Repository;
 use App\Entity\Message;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpFoundation\Request;
+use App\Dto\Request\MessageListRequestDto;
+use App\Dto\Request\Resolver\ParamsResolver;
 
 /**
  * @extends ServiceEntityRepository<Message>
@@ -22,20 +23,21 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
     
-    public function by(Request $request): array
+    /**
+     * @return array<int, Message>
+     */
+    public function findByStatus(?string $status): array
     {
-        $status = $request->query->get('status');
-        
-        if ($status) {
-            $messages = $this->getEntityManager()
-                ->createQuery(
-                    sprintf("SELECT m FROM App\Entity\Message m WHERE m.status = '%s'", $status)
-                )
-                ->getResult();
+        if ($status !== null) {
+            //Using sprintf() with $status directly is dangerous.
+            //If $status comes from user input, it can allow SQL injection, even in DQL.
+            //Solution: Use parameter binding to safely include user input in queries.
+            $messages = $this->findBy(['status' => $status]);
         } else {
             $messages = $this->findAll();
         }
-        
         return $messages;
     }
+
+
 }
