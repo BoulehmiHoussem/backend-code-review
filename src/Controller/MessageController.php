@@ -11,13 +11,12 @@ namespace App\Controller;
  *  and can trigger warnings from static analysis tools
  */
 
-use App\Message\SendMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Dto\Request\MessageListRequestDto;
+use App\Dto\Request\Impl\MessageListRequestDto;
+use App\Dto\Request\Impl\SendMessageRequestDto;
 use App\Service\MessageService;
 
 /**
@@ -34,7 +33,6 @@ class MessageController extends AbstractController
      */
     public function __construct(
         private MessageService $messageService,
-        private MessageBusInterface $bus,
     ) {}
 
     /**
@@ -72,21 +70,28 @@ class MessageController extends AbstractController
         );
     }
 
-    #[Route('/messages/send', methods: ['GET'])]
-    public function send(Request $request): Response
+    /** Change the route method to post */
+    #[Route('/messages/send', methods: ['POST'])]
+    public function send(SendMessageRequestDto $messageDto): Response
     {
-        $message = $request->query->get('text');
 
-        // TODO: currently, the repository receives the raw Request object.
-        // Enhancement: create a typed DTO (e.g., MessageListRequestDto) and map query params to it.
-        // Preferably to rename the method "by" to something more descriptive like "findByStatus". 
+        /** 
+        * TODO: currently, the repository receives the raw Request object.
+        * Enhancement: create a typed DTO (e.g., MessageListRequestDto) and map query params to it.
+        * Preferably to rename the method "by" to something more descriptive like "findByStatus".
+        * Move the validation to dto and use use Symfony\Component\Validator\Constraints as Assert.
+        * Use transformers/serializers to extract only the relevant data.
+        * This keeps repositories focused on data access, services on business logic, and controllers thin and expressive. 
+        * Move the dispatch logic to the service layer
+        * to keep controllers thin and focused on handling HTTP requests/responses.
+        * This also makes it easier to test business logic in isolation.*/
+        $this->messageService->sendMessage($messageDto->text);
 
-        if (!$message) {
-            return new Response('Text is required', Response::HTTP_BAD_REQUEST);
-        }
-
-        $this->bus->dispatch(new SendMessage($message));
-
-        return new Response('Successfully sent', Response::HTTP_NO_CONTENT);
+        /**  Using the abstract base controller’s ->json() method ensures cleaner, 
+         * consistent, and safer JSON responses with proper headers and encoding handled automatically. */
+        return $this->json(
+            null,
+            Response::HTTP_NO_CONTENT,
+        );
     }
 }

@@ -3,15 +3,18 @@
 namespace App\Service;
 
 use App\Repository\MessageRepository;
-use App\Dto\Request\MessageListRequestDto;
+use App\Dto\Request\Impl\MessageListRequestDto;
 use App\Dto\Response\MessagesResponseDto;
-use App\Dto\Request\Resolver\MessageTransformer;
+use App\Dto\Response\Transformer\MessageTransformer;
+use Symfony\Component\Messenger\MessageBusInterface;
+use App\Message\SendMessage;
 
 class MessageService
 {
     public function __construct(
         private MessageRepository $repo,
-        private MessageTransformer $transformer
+        private MessageTransformer $transformer,
+        private MessageBusInterface $bus,        
     ) {}
 
 
@@ -27,5 +30,11 @@ class MessageService
 
         // Transform the messages to the response DTO format.
         return $this->transformer->transform($messages);
+    }
+
+    public function sendMessage(string $text): void
+    {
+        //$this->repo->createMessage($text);
+        $this->bus->dispatch(new SendMessage($text));
     }
 }

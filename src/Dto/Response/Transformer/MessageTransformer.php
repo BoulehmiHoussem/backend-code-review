@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace App\Dto\Request\Resolver;
+namespace App\Dto\Response\Transformer;
 
 use App\Entity\Message;
 use Symfony\Component\Form\DataTransformerInterface;

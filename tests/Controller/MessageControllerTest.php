@@ -22,7 +22,7 @@ class MessageControllerTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->client = static::createClient(); 
+        $this->client = static::createClient();
         $em = static::getContainer()->get(EntityManagerInterface::class);
         assert($em instanceof EntityManagerInterface);
         $this->entityManager = $em;
@@ -90,7 +90,7 @@ class MessageControllerTest extends WebTestCase
      * @param array<string, string> $queryParams
      * @param int $expectedCount
      */
-    function test_list(array $setupMessages ,$queryParams, int $expectedCount): void
+    function test_list(array $setupMessages, $queryParams, int $expectedCount): void
     {
         // GIVEN messages in database
 
@@ -113,7 +113,7 @@ class MessageControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $data = json_decode($this->client->getResponse()->getContent(), true);
+        assert(is_array($data = json_decode($this->client->getResponse()->getContent(), true)));
         $this->assertCount($expectedCount, $data['messages']);
 
         foreach ($data['messages'] as $msg) {
@@ -125,9 +125,16 @@ class MessageControllerTest extends WebTestCase
 
     function test_that_it_sends_a_message(): void
     {
-        $this->client->request('GET', '/messages/send', [
-            'text' => 'Hello World',
-        ]);
+        $this->client->request(
+            'POST',
+            '/messages/send',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode([
+                'text' => 'Hello World',
+            ])
+        );
 
         $this->assertResponseIsSuccessful();
         // This is using https://packagist.org/packages/zenstruck/messenger-test

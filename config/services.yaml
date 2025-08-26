@@ -7,7 +7,18 @@ parameters:
 
 services:
 
-    App\Dto\Request\Resolver\MessageTransformer:
+    # Register the custom argument resolver as a service
+    App\Dto\Request\Resolver\SendMessageRequestResolver:
+        autowire: true
+        autoconfigure: true
+    
+    App\Dto\Request\Resolver\MessageListRequestResolver:
+        autowire: true
+        autoconfigure: true
+
+
+    # Register the data transformer as a service
+    App\Dto\Response\Transformer\MessageTransformer:
         autowire: true
         autoconfigure: true
 
