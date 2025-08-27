@@ -52,7 +52,7 @@ class Message
         return $this->text;
     }
 
-    public function setText(string $text): static
+    public function setText(?string $text): static
     {
         $this->text = $text;
 

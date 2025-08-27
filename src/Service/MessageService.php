@@ -8,13 +8,17 @@ use App\Dto\Response\MessagesResponseDto;
 use App\Dto\Response\Transformer\MessageTransformer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use App\Message\SendMessage;
+use App\Dto\Request\Impl\SendMessageRequestDto;
+use App\Entity\Message;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class MessageService
 {
     public function __construct(
         private MessageRepository $repo,
         private MessageTransformer $transformer,
-        private MessageBusInterface $bus,        
+        private MessageBusInterface $bus,
+        private ValidatorInterface $validator, // Inject the validator service
     ) {}
 
 
@@ -32,9 +36,43 @@ class MessageService
         return $this->transformer->transform($messages);
     }
 
-    public function sendMessage(string $text): void
+    /**
+     * Sends a message by dispatching it to the message bus.
+     * @param SendMessageRequestDto $dto The text of the message to be sent.
+     */
+    public function sendMessage(SendMessageRequestDto $dto): Message
     {
-        //$this->repo->createMessage($text);
-        $this->bus->dispatch(new SendMessage($text));
+        // Validate the DTO
+        $errors = $this->validator->validate($dto);
+        if (count($errors) > 0) {
+            // Handle validation errors (you can throw an exception or return an error response)
+            throw new \InvalidArgumentException((string) $errors);
+        }
+        $message = $this->repo->createMessage($dto->getText());
+
+        // Dispatch the message to the message bus for asynchronous processing.
+        $this->bus->dispatch(new SendMessage($message));
+
+        // Return the created message entity
+        return $message;
     }
+
+    /**
+     * Sets the status of a message to 'sent'.
+     * @param string|null $uuid The UUID of the message entity to update.
+     */
+    public function setStatusToSent(string $uuid): void
+    {
+        $this->repo->setStatusToSent($uuid);
+    }
+
+    /**
+     * Sets the status of a message to 'failed'.
+     * @param string|null $uuid The message entity to update.
+     */
+    public function setStatusToFailed(string $uuid): void
+    {
+        $this->repo->setStatusToFailed($uuid);
+    }
+
 }

@@ -14,14 +14,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 class SendMessageRequestDto implements RequestDtoInterface
 {
     /** The message */
-    #[Assert\NotBlank(message: "Text is required")]
-    #[Assert\Type('string', message: "Text must be a string")]
-    #[Assert\Length(
-        max: 1000,
-        maxMessage: "Text cannot be longer than {{ limit }} characters"
-    )]
+
     public function __construct(
+        #[Assert\NotBlank(message: "Text is required")]
         public readonly ?string $text = null
-    ) {
+    ) {}
+
+    public function getText(): ?string
+    {
+        return $this->text;
     }
 }

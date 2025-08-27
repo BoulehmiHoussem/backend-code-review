@@ -22,6 +22,12 @@ services:
         autowire: true
         autoconfigure: true
 
+    # Register the message handler as a service
+    App\MessageHandler\:
+        resource: '../src/MessageHandler'
+        tags: ['messenger.message_handler']
+
+
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.

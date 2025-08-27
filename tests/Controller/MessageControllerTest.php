@@ -123,8 +123,33 @@ class MessageControllerTest extends WebTestCase
         }
     }
 
-    function test_that_it_sends_a_message(): void
+
+     public function listSendMessagesProvider(): array
     {
+        return [
+            'valid message' => [
+                'message' => "Hello World",
+                'status' => 201,
+                'dispatched' => 1,
+            ],
+            'empty message' => [
+                'message' => "",
+                'status' => 400,
+                'dispatched' => 0,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider listSendMessagesProvider
+     * @param string $message
+     * @param int $status
+     * @param int $dispatched
+     */
+    function test_that_it_sends_a_message(string $message, int $status, $dispatched): void
+    {
+        // WHEN requesting /messages/send
+
         $this->client->request(
             'POST',
             '/messages/send',
@@ -132,14 +157,14 @@ class MessageControllerTest extends WebTestCase
             [],
             ['CONTENT_TYPE' => 'application/json'],
             json_encode([
-                'text' => 'Hello World',
+                'text' => $message,
             ])
         );
 
-        $this->assertResponseIsSuccessful();
+        $this->assertResponseStatusCodeSame($status);
         // This is using https://packagist.org/packages/zenstruck/messenger-test
-        $this->transport('sync')
+        $this->transport('async')
             ->queue()
-            ->assertContains(SendMessage::class, 1);
+            ->assertContains(SendMessage::class, $dispatched);
     }
 }
