@@ -37,7 +37,7 @@ class SendMessageHandler
                 ->text('You have a new message: ' . $textMessage->message->getText());
             $this->mailer->send($email);
         } catch (\Throwable $th) {
-            throw $th; // rethrow the exception to be handled by the messenger failure handling
+            throw new \ErrorException("Mailer failed");
         }
     }
 }

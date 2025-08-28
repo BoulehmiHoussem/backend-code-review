@@ -56,6 +56,8 @@ class MessageController extends AbstractController
          * and using transformers/serializers to extract only the relevant data, 
          * we ensure that repositories stay focused on data access, services handle business logic, 
          * and controllers remain thin and expressive.
+         * Retrieving all rows from the database in a single query can be very slow 
+         * and consume a lot of memory (we can add pagination if needed).
          */
         $messages = $this->messageService->listMessages($params);
 
@@ -96,7 +98,7 @@ class MessageController extends AbstractController
                 ['Content-Type' => 'application/json'],
                 ['json_encode_options' => JSON_THROW_ON_ERROR]
             );
-        } catch (\InvalidArgumentException $e) {
+        } catch (\Throwable $e) {
             return $this->json(
                 ['error' => $e->getMessage()],
                 Response::HTTP_BAD_REQUEST

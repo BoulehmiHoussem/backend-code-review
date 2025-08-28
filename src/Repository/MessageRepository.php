@@ -56,21 +56,6 @@ class MessageRepository extends ServiceEntityRepository
         return $message;
     }
 
-    /**
-     * Updates the status of a message identified by its UUID.
-     *
-     * @param string $uuid The UUID of the message to update.
-     * @param string $status The new status to set.
-     */
-    public function updateMessageStatus(string $uuid, string $status): void
-    {
-        $message = $this->findOneBy(['uuid' => $uuid]);
-        if ($message) {
-            $message->setStatus($status);
-            $this->getEntityManager()->persist($message);
-            $this->getEntityManager()->flush();
-        }
-    }
 
     /**
      * Sets the status of a message to 'sent'.
