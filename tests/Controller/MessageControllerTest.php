@@ -113,7 +113,10 @@ class MessageControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        assert(is_array($data = json_decode($this->client->getResponse()->getContent(), true)));
+        $responseContent = $this->client->getResponse()->getContent() ?: '{}'; 
+           
+        $data = json_decode($responseContent, true);
+        $this->assertIsArray($data);
         $this->assertCount($expectedCount, $data['messages']);
 
         foreach ($data['messages'] as $msg) {
@@ -124,7 +127,12 @@ class MessageControllerTest extends WebTestCase
     }
 
 
-     public function listSendMessagesProvider(): array
+    
+    /**
+     * data provider
+     * @return array<array<string,string|int>>
+     */
+    public function listSendMessagesProvider(): array
     {
         return [
             'valid message' => [
@@ -149,16 +157,14 @@ class MessageControllerTest extends WebTestCase
     function test_that_it_sends_a_message(string $message, int $status, $dispatched): void
     {
         // WHEN requesting /messages/send
-
+        $encoded_message = json_encode(['text' => $message]) ?: "{}";
         $this->client->request(
             'POST',
             '/messages/send',
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
-            json_encode([
-                'text' => $message,
-            ])
+            $encoded_message
         );
 
         $this->assertResponseStatusCodeSame($status);

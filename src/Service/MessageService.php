@@ -30,7 +30,7 @@ class MessageService
     public function listMessages(MessageListRequestDto $params): MessagesResponseDto
     {
         // Fetch messages based on the status filter from the DTO.
-        $messages = $this->repo->findByStatus($params->status);
+        $messages = $this->repo->findByStatus($params->status->value ?? null);
 
         // Transform the messages to the response DTO format.
         return $this->transformer->transform($messages);
@@ -59,7 +59,7 @@ class MessageService
 
     /**
      * Sets the status of a message to 'sent'.
-     * @param string|null $uuid The UUID of the message entity to update.
+     * @param string $uuid The UUID of the message entity to update.
      */
     public function setStatusToSent(string $uuid): void
     {
@@ -68,7 +68,7 @@ class MessageService
 
     /**
      * Sets the status of a message to 'failed'.
-     * @param string|null $uuid The message entity to update.
+     * @param string $uuid The message entity to update.
      */
     public function setStatusToFailed(string $uuid): void
     {

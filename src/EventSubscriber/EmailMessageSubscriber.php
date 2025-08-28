@@ -30,6 +30,11 @@ class EmailMessageSubscriber implements EventSubscriberInterface
         if (!$envelopeMessage instanceof SendMessage) {
             return;
         }
+
+        if(!$envelopeMessage->message->getUuid()) {
+            $this->logger->error('Message UUID is missing, cannot update status.');
+            return;
+        }
         // Update the message status to 'sent'
         $this->messageService->setStatusToSent($envelopeMessage->message->getUuid());
 
@@ -43,6 +48,12 @@ class EmailMessageSubscriber implements EventSubscriberInterface
         if (!$envelopeMessage instanceof SendMessage) {
             return;
         }
+
+         if(!$envelopeMessage->message->getUuid()) {
+            $this->logger->error('Message UUID is missing, cannot update status.');
+            return;
+        }
+        
         // Update the message status to 'failed'
         $this->messageService->setStatusToFailed($envelopeMessage->message->getUuid());
         $this->logger->error('Failed to send message, Status updated to FAILED.');

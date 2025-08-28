@@ -80,6 +80,7 @@ class MessageRepository extends ServiceEntityRepository
      */
     public function SetStatusToSent(string $uuid) : void{
         $message = $this->findOneBy(['uuid' => $uuid]);
+        if (!$message) throw new \InvalidArgumentException("Message with UUID $uuid not found.");
         $message->setStatus(MessageStatusEnum::SENT->value);
         $this->getEntityManager()->persist($message);
         $this->getEntityManager()->flush();
@@ -93,6 +94,7 @@ class MessageRepository extends ServiceEntityRepository
      */
     public function SetStatusToFailed(string $uuid) :void{
         $message = $this->findOneBy(['uuid' => $uuid]);
+        if (!$message) throw new \InvalidArgumentException("Message with UUID $uuid not found.");
         $message->setStatus(MessageStatusEnum::FAILED->value);
         $this->getEntityManager()->persist($message);
         $this->getEntityManager()->flush();

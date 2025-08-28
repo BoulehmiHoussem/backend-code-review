@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Dto\Request\Resolver;
 
 use App\Dto\Request\Impl\MessageListRequestDto;
+use App\Enum\MessageStatusEnum;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
@@ -26,7 +27,7 @@ class ParamsResolver extends AbstarctRequestResolver
 
         // Yield a new instance of MessageListRequestDto with the extracted status
         yield new MessageListRequestDto(
-            status: $status !== null ? (string) $status : null
+            status: $status !== null ? MessageStatusEnum::from((string)$status)  : null
         );
     }
 }
