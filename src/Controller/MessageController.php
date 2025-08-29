@@ -59,16 +59,23 @@ class MessageController extends AbstractController
          * Retrieving all rows from the database in a single query can be very slow 
          * and consume a lot of memory (we can add pagination if needed).
          */
-        $messages = $this->messageService->listMessages($params);
+        try {
+            $messages = $this->messageService->listMessages($params);
 
-        /**  Using the abstract base controller’s ->json() method ensures cleaner, 
-         * consistent, and safer JSON responses with proper headers and encoding handled automatically. */
-        return $this->json(
-            $messages,
-            Response::HTTP_OK,
-            ['Content-Type' => 'application/json'],
-            ['json_encode_options' => JSON_THROW_ON_ERROR]
-        );
+            /**  Using the abstract base controller’s ->json() method ensures cleaner, 
+             * consistent, and safer JSON responses with proper headers and encoding handled automatically. */
+            return $this->json(
+                $messages,
+                Response::HTTP_OK,
+                ['Content-Type' => 'application/json'],
+                ['json_encode_options' => JSON_THROW_ON_ERROR]
+            );
+        } catch (\Throwable $e) {
+            return $this->json(
+                ['error' => $e->getMessage()],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
     }
 
     /** Change the route method to post */

@@ -29,8 +29,10 @@ class MessageService
      */
     public function listMessages(MessageListRequestDto $params): MessagesResponseDto
     {
+        
         // Fetch messages based on the status filter from the DTO.
         $messages = $this->repo->findByStatus($params->status->value ?? null);
+
 
         // Transform the messages to the response DTO format.
         return $this->transformer->transform($messages);
@@ -74,5 +76,4 @@ class MessageService
     {
         $this->repo->setStatusToFailed($uuid);
     }
-
 }

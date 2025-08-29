@@ -98,10 +98,8 @@ class MessageControllerTest extends WebTestCase
 
         foreach ($setupMessages as $msgData) {
             $msg = new Message();
-            $msg->setUuid($msgData['uuid']);
             $msg->setText($msgData['text']);
             $msg->setStatus($msgData['status']);
-            $msg->setCreatedAt(new \DateTime($msgData['createdAt']));
             $this->entityManager->persist($msg);
         }
         $this->entityManager->flush();
@@ -113,8 +111,8 @@ class MessageControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-        $responseContent = $this->client->getResponse()->getContent() ?: '{}'; 
-           
+        $responseContent = $this->client->getResponse()->getContent() ?: '{}';
+
         $data = json_decode($responseContent, true);
         $this->assertIsArray($data);
         $this->assertCount($expectedCount, $data['messages']);
@@ -125,8 +123,6 @@ class MessageControllerTest extends WebTestCase
             $this->assertArrayHasKey('status', $msg);
         }
     }
-
-
     
     /**
      * data provider

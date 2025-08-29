@@ -27,7 +27,7 @@ class ParamsResolver extends AbstarctRequestResolver
 
         // Yield a new instance of MessageListRequestDto with the extracted status
         yield new MessageListRequestDto(
-            status: $status !== null ? MessageStatusEnum::from((string)$status)  : null
+            status: $status !== null ? MessageStatusEnum::tryFrom((string)$status)  : null
         );
     }
 }

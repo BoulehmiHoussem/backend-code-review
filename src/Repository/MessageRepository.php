@@ -48,9 +48,6 @@ class MessageRepository extends ServiceEntityRepository
     {
         $message = new Message();
         $message->setText($text);   
-        $message->setUuid(\Symfony\Component\Uid\Uuid::v6()->toRfc4122());
-        $message->setStatus(MessageStatusEnum::PENDING->value);
-        $message->setCreatedAt(new \DateTime());
         $this->getEntityManager()->persist($message);
         $this->getEntityManager()->flush();
         return $message;
