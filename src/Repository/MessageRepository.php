@@ -3,9 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Message;
+use App\Enum\MessageStatusEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @extends ServiceEntityRepository<Message>
@@ -22,20 +22,63 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
     
-    public function by(Request $request): array
+    /**
+     * @return array<int, Message>
+     */
+    public function findByStatus(?string $status): array
     {
-        $status = $request->query->get('status');
-        
-        if ($status) {
-            $messages = $this->getEntityManager()
-                ->createQuery(
-                    sprintf("SELECT m FROM App\Entity\Message m WHERE m.status = '%s'", $status)
-                )
-                ->getResult();
+        if ($status !== null) {
+            //Using sprintf() with $status directly is dangerous.
+            //If $status comes from user input, it can allow SQL injection, even in DQL.
+            //Solution: Use parameter binding to safely include user input in queries.
+            $messages = $this->findBy(['status' => $status]);
         } else {
             $messages = $this->findAll();
         }
-        
         return $messages;
+    }
+
+    /**
+     * Creates and persists a new Message entity.
+     *
+     * @param string $text The text of the message.
+     * @return Message The persisted message entity.
+     */
+    public function createMessage(?string $text): Message
+    {
+        $message = new Message();
+        $message->setText($text);   
+        $this->getEntityManager()->persist($message);
+        $this->getEntityManager()->flush();
+        return $message;
+    }
+
+
+    /**
+     * Sets the status of a message to 'sent'.
+     *
+     * @param string $uuid The message entity to update.
+     * @return void
+     */
+    public function SetStatusToSent(string $uuid) : void{
+        $message = $this->findOneBy(['uuid' => $uuid]);
+        if (!$message) throw new \InvalidArgumentException("Message with UUID $uuid not found.");
+        $message->setStatus(MessageStatusEnum::SENT->value);
+        $this->getEntityManager()->persist($message);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * Sets the status of a message to 'failed'.
+     *
+     * @param string $uuid The message entity to update.
+     * @return void
+     */
+    public function SetStatusToFailed(string $uuid) :void{
+        $message = $this->findOneBy(['uuid' => $uuid]);
+        if (!$message) throw new \InvalidArgumentException("Message with UUID $uuid not found.");
+        $message->setStatus(MessageStatusEnum::FAILED->value);
+        $this->getEntityManager()->persist($message);
+        $this->getEntityManager()->flush();
     }
 }

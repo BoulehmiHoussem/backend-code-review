@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\MessageRepository;
-use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Enum\MessageStatusEnum;
+use DateTimeImmutable;
+use Symfony\Component\Uid\Uuid;
 
+#[ORM\HasLifecycleCallbacks] // Enable lifecycle callbacks
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
 /**
  * TODO: Review Message class
@@ -20,15 +23,33 @@ class Message
 
     #[ORM\Column(type: Types::GUID)]
     private ?string $uuid = null;
-
+    
     #[ORM\Column(length: 255)]
     private ?string $text = null;
 
+    /**Currently nullable: #[ORM\Column(length: 255, nullable: true)] private ?string $status = null;
+     * But in your repository, createMessage() always sets PENDING.
+     * Make it non-nullable with default value
+     * Since this status will be managed automatically we will need to validate it in the request ParamsDto only
+     * */
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $status = null;
+    private string $status = MessageStatusEnum::PENDING->value;
     
-    #[ORM\Column(type: 'datetime')]
-    private DateTime $createdAt;
+    /** Currently type-hinted as DateTime, but better to use immutable DateTimeImmutable 
+     * With DateTime, this mutates the original timestamp stored in the entity, possibly causing bugs when persisting or comparing dates.
+    */
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt;
+
+    /** 
+     * Initialize Uuid, Status 
+     * Created at we will set it using ORM lifecyclehook (PrePersist) 
+     */
+    public function __construct()
+    {
+        $this->uuid = Uuid::v6()->toRfc4122();
+        $this->status = MessageStatusEnum::PENDING->value;
+    }
 
     public function getId(): ?int
     {
@@ -52,7 +73,7 @@ class Message
         return $this->text;
     }
 
-    public function setText(string $text): static
+    public function setText(?string $text): static
     {
         $this->text = $text;
 
@@ -71,15 +92,22 @@ class Message
         return $this;
     }
 
-    public function getCreatedAt(): DateTime
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTime $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
         
         return $this;
     }
+
+    #[ORM\PrePersist]
+    public function initializeCreatedAt(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
 }

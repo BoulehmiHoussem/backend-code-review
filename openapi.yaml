@@ -15,8 +15,9 @@ paths:
           schema:
             type: "string"
             enum:
+              - "pending"
               - "sent"
-              - "read"
+              - "failed"
       responses:
         '200':
           description: Successful response
@@ -37,26 +38,70 @@ paths:
                         status:
                           type: "string"
                           enum:
+                            - "pending"
                             - "sent"
-                            - "read"
+                            - "failed"
               example:
                 messages:
-                  - text: "Hello, World!"
-                    status: "read"
-                  - text: "How are you today?"
+                  - uuid: "uuid-1"
+                    text: "hello"
+                    status: "pending"
+                  - uuid: "uuid-2"
+                    text: "how are you"
                     status: "sent"
-                  - text: "Thanks, I'm fine. How about you?"
-                    status: "sent"
+                  - uuid: "uuid-2"
+                    text: "i'm fine thx"
+                    status: "failed"
+                  
+
   /messages/send:
-    get:
+    post:
       summary: Send a Message
-      parameters:
-        - name: text
-          in: query
-          description: The text you want to send
-          required: true
-          schema:
-            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  example: "hello"
+              required:
+                - text
       responses:
-        '204':
-          description: Successfully sent
+        '201':
+          description: Message created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 3595
+                  uuid:
+                    type: string
+                    format: uuid
+                    example: "1f08477a-1e3a-6dc0-b8fc-97323204e66d"
+                  text:
+                    type: string
+                    example: "hello"
+                  status:
+                    type: string
+                    enum: [pending, sent, failed]
+                    example: "pending"
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: "2025-08-29T01:29:40+00:00"
+        '400':
+          description: Bad request - invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Text is required"
