@@ -48,7 +48,7 @@ class MessageService
         $errors = $this->validator->validate($dto);
         if (count($errors) > 0) {
             // Handle validation errors (you can throw an exception or return an error response)
-            throw new \InvalidArgumentException((string) $errors);
+            throw new \InvalidArgumentException((string) $errors[0]->getMessage());
         }
         $message = $this->repo->createMessage($dto->getText());
 
