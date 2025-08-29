@@ -19,7 +19,7 @@ class AppFixtures extends Fixture
             $message = new Message();
             $message->setUuid(Uuid::v6()->toRfc4122());
             $message->setText($faker->sentence);
-            $message->setStatus(random(['sent', 'read']));
+            $message->setStatus(random(['pending','sent','failed']));
             $message->setCreatedAt(new \DateTimeImmutable());
             
             $manager->persist($message);
