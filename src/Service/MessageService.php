@@ -46,7 +46,7 @@ class MessageService
     {
         // Validate the DTO
         $errors = $this->validator->validate($dto);
-        if (count($errors) > 0) {
+        if (count($errors) > 0 && $errors[0] != null) {
             // Handle validation errors (you can throw an exception or return an error response)
             throw new \InvalidArgumentException((string) $errors[0]->getMessage());
         }
