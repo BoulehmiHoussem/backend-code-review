@@ -17,7 +17,6 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Dto\Request\Impl\MessageListRequestDto;
 use App\Dto\Request\Impl\SendMessageRequestDto;
 use App\Service\MessageService;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @see MessageControllerTest
