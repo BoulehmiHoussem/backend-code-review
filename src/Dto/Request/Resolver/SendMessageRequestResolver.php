@@ -24,7 +24,7 @@ class SendMessageRequestResolver extends AbstarctRequestResolver
 
         // Yield a new instance of SendMessageRequestDto with the extracted text
         yield new SendMessageRequestDto(
-            text: $text !== null ? (string) $text : null
+            text: $text
         );
     }
 }

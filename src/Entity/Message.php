@@ -11,9 +11,7 @@ use Symfony\Component\Uid\Uuid;
 
 #[ORM\HasLifecycleCallbacks] // Enable lifecycle callbacks
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
-/**
- * TODO: Review Message class
- */
+
 class Message
 {
     #[ORM\Id]
@@ -21,19 +19,21 @@ class Message
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::GUID)]
-    private ?string $uuid = null;
+    #[ORM\Column(type: Types::GUID, unique: true)]
+    private string $uuid;
     
-    #[ORM\Column(length: 255)]
-    private ?string $text = null;
+
+    // text shouldn't be null
+    #[ORM\Column(length: 255, nullable: false)]
+    private string $text;
 
     /**Currently nullable: #[ORM\Column(length: 255, nullable: true)] private ?string $status = null;
      * But in your repository, createMessage() always sets PENDING.
      * Make it non-nullable with default value
      * Since this status will be managed automatically we will need to validate it in the request ParamsDto only
-     * */
-    #[ORM\Column(length: 255, nullable: true)]
-    private string $status = MessageStatusEnum::PENDING->value;
+     * */   
+    #[ORM\Column(enumType: MessageStatusEnum::class)]
+    private MessageStatusEnum $status = MessageStatusEnum::PENDING;
     
     /** Currently type-hinted as DateTime, but better to use immutable DateTimeImmutable 
      * With DateTime, this mutates the original timestamp stored in the entity, possibly causing bugs when persisting or comparing dates.
@@ -48,7 +48,7 @@ class Message
     public function __construct()
     {
         $this->uuid = Uuid::v6()->toRfc4122();
-        $this->status = MessageStatusEnum::PENDING->value;
+        $this->status = MessageStatusEnum::PENDING;
     }
 
     public function getId(): ?int
@@ -68,24 +68,24 @@ class Message
         return $this;
     }
 
-    public function getText(): ?string
+    public function getText(): string
     {
         return $this->text;
     }
 
-    public function setText(?string $text): static
+    public function setText(string $text): static
     {
         $this->text = $text;
 
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): MessageStatusEnum
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(MessageStatusEnum $status): static
     {
         $this->status = $status;
 
@@ -104,6 +104,9 @@ class Message
         return $this;
     }
 
+    /**
+     * IF we want to add other entities that uses tomestampable we can create a trait for this part
+     */
     #[ORM\PrePersist]
     public function initializeCreatedAt(): void
     {

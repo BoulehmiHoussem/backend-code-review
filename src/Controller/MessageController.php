@@ -18,11 +18,7 @@ use App\Dto\Request\Impl\MessageListRequestDto;
 use App\Dto\Request\Impl\SendMessageRequestDto;
 use App\Service\MessageService;
 
-/**
- * @see MessageControllerTest
- * TODO: review both methods and also the `openapi.yaml` specification
- *       Add Comments for your Code-Review, so that the developer can understand why changes are needed.
- */
+
 class MessageController extends AbstractController
 {
     /** Inject the MessageService via constructor for better testability and adherence to Dependency Injection principles 
@@ -34,9 +30,9 @@ class MessageController extends AbstractController
     ) {}
 
     /**
-     * TODO: cover this method with tests, and refactor the code (including other files that need to be refactored)
+     * Specify method of the request
      */
-    #[Route('/messages')]
+    #[Route('/messages',methods: ['GET'])]
 
     /** We need to create a resolver to automatically map request parameters to the MessageListRequestDto
      * so that controllers stay clean and focused, request validation and type safety are centralized, 

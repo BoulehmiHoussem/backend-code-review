@@ -44,7 +44,7 @@ class MessageRepository extends ServiceEntityRepository
      * @param string $text The text of the message.
      * @return Message The persisted message entity.
      */
-    public function createMessage(?string $text): Message
+    public function createMessage(string $text): Message
     {
         $message = new Message();
         $message->setText($text);   
@@ -63,7 +63,7 @@ class MessageRepository extends ServiceEntityRepository
     public function SetStatusToSent(string $uuid) : void{
         $message = $this->findOneBy(['uuid' => $uuid]);
         if (!$message) throw new \InvalidArgumentException("Message with UUID $uuid not found.");
-        $message->setStatus(MessageStatusEnum::SENT->value);
+        $message->setStatus(MessageStatusEnum::SENT);
         $this->getEntityManager()->persist($message);
         $this->getEntityManager()->flush();
     }
@@ -77,7 +77,7 @@ class MessageRepository extends ServiceEntityRepository
     public function SetStatusToFailed(string $uuid) :void{
         $message = $this->findOneBy(['uuid' => $uuid]);
         if (!$message) throw new \InvalidArgumentException("Message with UUID $uuid not found.");
-        $message->setStatus(MessageStatusEnum::FAILED->value);
+        $message->setStatus(MessageStatusEnum::FAILED);
         $this->getEntityManager()->persist($message);
         $this->getEntityManager()->flush();
     }

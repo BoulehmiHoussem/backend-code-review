@@ -40,7 +40,7 @@ class MessageService
 
     /**
      * Sends a message by dispatching it to the message bus.
-     * @param SendMessageRequestDto $dto The text of the message to be sent.
+     * @param SendMessageRequestDto $dto The DTO containing the message payload to be sent.
      */
     public function sendMessage(SendMessageRequestDto $dto): Message
     {

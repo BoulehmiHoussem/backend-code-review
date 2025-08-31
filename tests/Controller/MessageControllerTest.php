@@ -11,6 +11,7 @@ use App\Entity\Message;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use App\Enum\MessageStatusEnum;
 
 class MessageControllerTest extends WebTestCase
 {
@@ -94,12 +95,10 @@ class MessageControllerTest extends WebTestCase
     {
         // GIVEN messages in database
 
-        $this->entityManager->createQuery('DELETE FROM App\Entity\Message m')->execute();
-
         foreach ($setupMessages as $msgData) {
             $msg = new Message();
             $msg->setText($msgData['text']);
-            $msg->setStatus($msgData['status']);
+            $msg->setStatus(MessageStatusEnum::from($msgData['status']));
             $this->entityManager->persist($msg);
         }
         $this->entityManager->flush();
