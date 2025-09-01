@@ -7,7 +7,7 @@ use App\Enum\MessageStatusEnum;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
-use Symfony\Component\Uid\Uuid;
+
 use function Psl\Iter\random;
 
 class AppFixtures extends Fixture
@@ -18,11 +18,10 @@ class AppFixtures extends Fixture
         
         foreach (range(1, 10) as $i) {
             $message = new Message();
-            $message->setUuid(Uuid::v6()->toRfc4122());
+            // uuid will be set in Message Constructor
             $message->setText($faker->sentence);
-            $message->setStatus(random([MessageStatusEnum::PENDING,MessageStatusEnum::SENT,MessageStatusEnum::FAILED]));
-            $message->setCreatedAt(new \DateTimeImmutable());
-            
+            $message->setStatus(random([MessageStatusEnum::PENDING,MessageStatusEnum::SENT,MessageStatusEnum::FAILED]));            
+            // created at will be set on PrePersist
             $manager->persist($message);
         }
 

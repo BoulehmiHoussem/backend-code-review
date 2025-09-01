@@ -21,14 +21,17 @@ class SendMessageHandler
     ) {}
     public function __invoke(SendMessage $textMessage): void
     {
-        // Here you would implement the logic to actually send the text message and not persisting the data.
-        // For example, integrating with an SMS gateway or email service.
-        // This is a placeholder implementation.
-        // those functions should be treated in background jobs
-        // to avoid slowing down the response time of the API.
-        // there are no specs for this part but i will simulate sending an email
-        // this part is just for demonstration purposes
-        // I used Mailtrap for testing emails
+        /**
+        * Here you would implement the logic to actually send the text message and not persisting the data.
+        * For example, integrating with an SMS gateway or email service.
+        * This is a placeholder implementation.
+        * those functions should be treated in background jobs
+        * to avoid slowing down the response time of the API.
+        * there are no specs for this part but i will simulate sending an email
+        * this part is just for demonstration purposes
+        * I used Mailtrap for testing emails
+        * @experimental
+        */
         try {
             $email = (new Email())
                 ->from('noreply@example.com')

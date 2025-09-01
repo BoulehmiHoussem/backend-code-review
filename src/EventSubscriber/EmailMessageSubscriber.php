@@ -67,7 +67,7 @@ class EmailMessageSubscriber implements EventSubscriberInterface
             $this->logger->error('An error occurred', ['exception' => $th]);
             return;
         }
-        $this->logger->error('Failed to send message, Status updated to FAILED.');
+        $this->logger->error('Failed to send message (Check MAILER_DSN .env), Status updated to FAILED.');
     }
 
     public static function getSubscribedEvents(): array

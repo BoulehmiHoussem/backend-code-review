@@ -23,7 +23,7 @@ abstract class AbstarctRequestResolver implements ValueResolverInterface
         }
 
         // Check if the argument type matches the requested DTO class
-        return $argument->getType() === $requestedDtoClass;
+        return is_a($argument->getType(), $requestedDtoClass, true);
     }
 
     /** 

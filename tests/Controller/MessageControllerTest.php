@@ -54,30 +54,30 @@ class MessageControllerTest extends WebTestCase
             ],
             'single message' => [
                 'setupMessages' => [
-                    ['uuid' => 'uuid-123', 'text' => 'Hello', 'status' => 'sent', 'createdAt' => '2025-08-25 15:00:00']
+                    ['text' => 'Hello', 'status' => 'sent']
                 ],
                 'queryParams' => [],
                 'expectedCount' => 1,
             ],
             'multiple messages' => [
                 'setupMessages' => [
-                    ['uuid' => 'uuid-1', 'text' => 'Message 1', 'status' => 'sent', 'createdAt' => '2025-08-25 12:00:00'],
-                    ['uuid' => 'uuid-2', 'text' => 'Message 2', 'status' => 'pending', 'createdAt' => '2025-08-25 13:00:00']
+                    ['text' => 'Message 1', 'status' => 'sent'],
+                    ['text' => 'Message 2', 'status' => 'pending']
                 ],
                 'queryParams' => [],
                 'expectedCount' => 2,
             ],
             'filter by status sent' => [
                 'setupMessages' => [
-                    ['uuid' => 'uuid-1', 'text' => 'Message 1', 'status' => 'sent', 'createdAt' => '2025-08-25 12:00:00'],
-                    ['uuid' => 'uuid-2', 'text' => 'Message 2', 'status' => 'pending', 'createdAt' => '2025-08-25 13:00:00']
+                    ['text' => 'Message 1', 'status' => 'sent'],
+                    ['text' => 'Message 2', 'status' => 'pending']
                 ],
                 'queryParams' => ['status' => 'sent'],
                 'expectedCount' => 1,
             ],
             'invalid query params ignored' => [
                 'setupMessages' => [
-                    ['uuid' => 'uuid-123', 'text' => 'Hello', 'status' => 'sent', 'createdAt' => '2025-08-25 15:00:00']
+                    ['text' => 'Hello', 'status' => 'sent']
                 ],
                 'queryParams' => ['foo' => 'bar', 'limit' => 'abc'],
                 'expectedCount' => 1,

@@ -6,40 +6,39 @@ use App\Repository\MessageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Enum\MessageStatusEnum;
-use DateTimeImmutable;
 use Symfony\Component\Uid\Uuid;
+use App\Entity\Trait\Timestampable;
 
 #[ORM\HasLifecycleCallbacks] // Enable lifecycle callbacks
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
 
 class Message
 {
+    // trait that has createdAt attributes and functions
+    use Timestampable;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
-    private string $uuid;
-    
+    private readonly string $uuid;
+
 
     // text shouldn't be null
-    #[ORM\Column(length: 255, nullable: false)]
+    #[ORM\Column(Types::TEXT, nullable: false)]
     private string $text;
 
     /**Currently nullable: #[ORM\Column(length: 255, nullable: true)] private ?string $status = null;
      * But in your repository, createMessage() always sets PENDING.
      * Make it non-nullable with default value
      * Since this status will be managed automatically we will need to validate it in the request ParamsDto only
-     * */   
-    #[ORM\Column(enumType: MessageStatusEnum::class)]
+     * Optional: enforce default value at DB level too using options: ["default" => MessageStatusEnum::PENDING])
+     * */
+    #[ORM\Column(enumType: MessageStatusEnum::class, options: ["default" => MessageStatusEnum::PENDING])]
     private MessageStatusEnum $status = MessageStatusEnum::PENDING;
-    
-    /** Currently type-hinted as DateTime, but better to use immutable DateTimeImmutable 
-     * With DateTime, this mutates the original timestamp stored in the entity, possibly causing bugs when persisting or comparing dates.
-    */
-    #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $createdAt;
+
 
     /** 
      * Initialize Uuid, Status 
@@ -48,7 +47,6 @@ class Message
     public function __construct()
     {
         $this->uuid = Uuid::v6()->toRfc4122();
-        $this->status = MessageStatusEnum::PENDING;
     }
 
     public function getId(): ?int
@@ -56,17 +54,13 @@ class Message
         return $this->id;
     }
 
-    public function getUuid(): ?string
+    public function getUuid(): string
     {
         return $this->uuid;
     }
 
-    public function setUuid(string $uuid): static
-    {
-        $this->uuid = $uuid;
+    // UUID should not change after creation (remove the setter)
 
-        return $this;
-    }
 
     public function getText(): string
     {
@@ -85,32 +79,13 @@ class Message
         return $this->status;
     }
 
+    /**
+     * @internal setStatus is intended for fixtures/tests only
+     */
     public function setStatus(MessageStatusEnum $status): static
     {
         $this->status = $status;
 
         return $this;
     }
-
-    public function getCreatedAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-        
-        return $this;
-    }
-
-    /**
-     * IF we want to add other entities that uses tomestampable we can create a trait for this part
-     */
-    #[ORM\PrePersist]
-    public function initializeCreatedAt(): void
-    {
-        $this->createdAt = new \DateTimeImmutable();
-    }
-
 }
